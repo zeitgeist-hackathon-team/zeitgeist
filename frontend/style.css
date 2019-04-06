@@ -253,10 +253,7 @@ h1 {
 }
 
 html {
-  /* background-image: url('https://media.giphy.com/media/3og0IvDE2HMdZ2aktW/giphy.gif');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-blend-mode: darken; */
+  
   margin: 0;
   padding: 0;
   width: 100%;
