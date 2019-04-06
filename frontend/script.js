@@ -35,7 +35,10 @@ $(document).ready(() => {
 
       $(`.${i}-button`).click(function () {
         $(this).toggleClass('clicked');
-        $('.north').text((i, text) => text === 'Sent!' ? 'North' : 'Sent!');
+        $(`.${i}`).text((i, text) =>
+          text === "Sent!" ? `${choice}` : "Sent!"
+        );
+        $("button").prop("disabled", true);
       });
     });
 
