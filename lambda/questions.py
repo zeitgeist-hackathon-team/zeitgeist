@@ -2,7 +2,16 @@
 import boto3
 import json
 
-dynamo = boto3.client('dynamodb', 'us-west-2')
+DYNAMO = boto3.client('dynamodb', 'us-west-2')
+TABLE_NAME = 'questions'
+
+
+def get_random_question(dynamo):
+    return {
+        'question': 'what\'s your most frequently visted website below?',
+        'answers':  ['reddit', 'medium', 'techcrunch', 'other']
+    } # todo echo
+
 
 def respond(err, res=None):
     return {
@@ -12,6 +21,7 @@ def respond(err, res=None):
             'Content-Type': 'application/json',
         },
     }
+
 
 def lambda_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
@@ -26,27 +36,22 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
-        'DELETE': lambda dynamo, x: dynamo.delete_item(**x),
-        'GET': lambda dynamo, x: dynamo.scan(**x),
-        'POST': lambda dynamo, x: dynamo.put_item(**x),
-        'PUT': lambda dynamo, x: dynamo.update_item(**x),
+        'GET': get_random_question,
+        # todo 'POST': lambda dynamo, x: dynamo.put_item(**x)
     }
 
     operation = event['httpMethod']
 
     if operation in operations:
-        payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
-        return respond(None, operations[operation](dynamo, payload))
+        # payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
+        return respond(None, operations[operation](DYNAMO))
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
 
 
 print(lambda_handler(
     {
-        'httpMethod': 'GET',
-        'queryStringParameters': {
-            'TableName' :'questions'
-        }
+        'httpMethod': 'GET'
     },
     None
 ))

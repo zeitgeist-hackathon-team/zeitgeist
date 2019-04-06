@@ -45,7 +45,7 @@ print(lambda_handler(
     {
         'httpMethod': 'GET',
         'queryStringParameters': {
-            'TableName' :'answers'
+            'TableName' :'questions'
         }
     },
     None
