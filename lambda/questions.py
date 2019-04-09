@@ -1,15 +1,28 @@
 
 import boto3
 import json
+from pprint import pprint
 
 DYNAMO = boto3.client('dynamodb', 'us-west-2')
 TABLE_NAME = 'questions'
 
 
-def get_random_question(dynamo):
+def get_random_question():
+
+    # return DYNAMO.scan(TableName = TABLE_NAME)
+
     return {
+        'id': 'random-uuid-id',
         'question': 'what\'s your most frequently visted website below?',
-        'answers':  ['reddit', 'medium', 'techcrunch', 'other']
+        'answers': {
+            'reddit': 3,
+            'medium': 234,
+            'techcrunch': 13
+        },
+        'other': {
+            'hackernoon': 1,
+            'hackernews': 2
+        }
     } # todo echo
 
 
@@ -19,6 +32,7 @@ def respond(err, res=None):
         'body': err.message if err else json.dumps(res),
         'headers': {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
         },
     }
 
@@ -40,18 +54,18 @@ def lambda_handler(event, context):
         # todo 'POST': lambda dynamo, x: dynamo.put_item(**x)
     }
 
-    operation = event['httpMethod']
+    op = event['httpMethod']
 
-    if operation in operations:
+    if op in operations:
         # payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
-        return respond(None, operations[operation](DYNAMO))
+        return respond(None, operations[op]())
     else:
-        return respond(ValueError('Unsupported method "{}"'.format(operation)))
+        return respond(ValueError('Unsupported method "{}"'.format(op)))
 
 
-print(lambda_handler(
-    {
-        'httpMethod': 'GET'
-    },
-    None
-))
+# pprint(lambda_handler(
+#     {
+#         'httpMethod': 'GET'
+#     },
+#     None
+# ))
