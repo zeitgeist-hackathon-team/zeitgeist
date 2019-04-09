@@ -1,10 +1,32 @@
 import boto3
 import json
-
-DYNAMO = boto3.client('dynamodb', 'us-west-2')
+from utils import client
+from boto3.dynamodb.conditions import Key
 
 def post_answer(payload):
-    print("posted beeeitch!!", payload)
+    # Expect the payload to be in this format:
+    """
+    expected payload from the request
+    {
+        "id": "quesiton_id",
+        "answers": ["A", "B"]
+        }
+    """
+    print("payload: \n", payload)
+    question_id = payload.get("id")
+    response = client.query(
+        KeyConditionExpression=Key('id').eq(question_id)
+    )
+    item = response['Items'][0]
+    print(type(item))
+    print("item: \n", item)
+    for answer in payload["answers"]:
+        votes = item["answers"].get(answer)
+        item["answers"].update({answer: votes + 1})
+
+    print("updated item: \n", item)
+    client.put_item(Item=item)
+
 
 
 def respond(err, res=None):
@@ -30,7 +52,7 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
-        'POST': post_answer,
+        'POST': lambda payload: post_answer(payload),
         # todo 'POST': lambda dynamo, x: dynamo.put_item(**x)
     }
 
@@ -46,8 +68,8 @@ print(lambda_handler(
     {
         'httpMethod': 'POST',
         'body': {
-            'question_id': 1,
-            'answer': 'Python'
+            'id': "1",
+            'answers': ['Python']
         }
     },
     None

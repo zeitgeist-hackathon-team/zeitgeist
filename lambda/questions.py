@@ -1,32 +1,45 @@
-
-import boto3
 import json
 from pprint import pprint
+from uuid import uuid4 as uuid
+from boto3.dynamodb.conditions import Key
+from utils import client
+from copy import deepcopy
 
-DYNAMO = boto3.client('dynamodb', 'us-west-2')
-TABLE_NAME = 'questions'
 
 
 def get_random_question():
+    # TODO get a random UUID
+    """
+    will return:
+    {
+        "id": "question_id",
+        "question": "what is abc?",
+        "answers": {"A": 10, "B": 20, "C": 30}
+    }
 
-    # return DYNAMO.scan(TableName = TABLE_NAME)
+    """
+    random_uuid = str(uuid())
 
-    return {
-        'id': 'random-uuid-id',
-        'question': 'what\'s your most frequently visted website below?',
-        'answers': {
-            'reddit': 3,
-            'medium': 234,
-            'techcrunch': 13
-        },
-        'other': {
-            'hackernoon': 1,
-            'hackernews': 2
-        }
-    } # todo echo
+    response = client.query(
+        KeyConditionExpression=Key('id').eq("1")
+    )
+    item = response['Items']
+    print(item)
 
-def post_question(body):
-    pass
+def post_question(payload):
+    """
+    expected payload from frontend
+    {
+        "id": "question_id",
+        "question": "what is abc",
+        "answers": ["A", "B", "C"]
+    }
+    """
+    item = deepcopy(payload)
+    item["answers"] = {}
+    for answer in payload["answers"]:
+        item["answers"].update({answer: 0})
+    client.put_item(Item=item)
 
 
 def respond(err, res=None):
@@ -53,23 +66,31 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
-        'GET': get_random_question,
+        'GET': get_random_question(),
         # 'POST': lambda dynamo, x: dynamo.put_item(**x)
-        'POST': lambda body: post_question(body)
+        'POST': lambda payload: post_question(payload)
     }
 
     op = event['httpMethod']
 
     if op in operations:
         # payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
-        return respond(None, operations[op]())
+        if op == "GET":
+            return respond(None, operations[op])
+        elif op == "POST":
+            return respond(None, operations[op](event['body']))
     else:
         return respond(ValueError('Unsupported method "{}"'.format(op)))
 
 
-# pprint(lambda_handler(
-#     {
-#         'httpMethod': 'GET'
-#     },
-#     None
-# ))
+pprint(lambda_handler(
+    {
+        'httpMethod': 'GET',
+        # 'body': {
+        # "id": "3",
+        # "question": "what is abc",
+        # "answers": ["A", "B", "C"]
+    # }
+    },
+    None
+))
