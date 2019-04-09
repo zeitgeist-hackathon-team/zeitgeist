@@ -1,0 +1,10 @@
+{
+  "name": "Questions",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "Some questions are asked",
+  "homepage_url": "http://homepage.com",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  }
+}

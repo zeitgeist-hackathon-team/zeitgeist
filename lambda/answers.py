@@ -1,7 +1,11 @@
 import boto3
 import json
 
-dynamo = boto3.client('dynamodb', 'us-west-2')
+DYNAMO = boto3.client('dynamodb', 'us-west-2')
+
+def post_answer(payload):
+    print("posted beeeitch!!", payload)
+
 
 def respond(err, res=None):
     return {
@@ -9,6 +13,7 @@ def respond(err, res=None):
         'body': err.message if err else json.dumps(res),
         'headers': {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
         },
     }
 
@@ -25,26 +30,24 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
-        'DELETE': lambda dynamo, x: dynamo.delete_item(**x),
-        'GET': lambda dynamo, x: dynamo.scan(**x),
-        'POST': lambda dynamo, x: dynamo.put_item(**x),
-        'PUT': lambda dynamo, x: dynamo.update_item(**x),
+        'POST': post_answer,
+        # todo 'POST': lambda dynamo, x: dynamo.put_item(**x)
     }
 
-    operation = event['httpMethod']
+    op = event['httpMethod']
 
-    if operation in operations:
-        payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
-        return respond(None, operations[operation](dynamo, payload))
+    if op in operations:
+        return respond(None, operations[op](event['body']))
     else:
-        return respond(ValueError('Unsupported method "{}"'.format(operation)))
+        return respond(ValueError('Unsupported method "{}"'.format(op)))
 
 
 print(lambda_handler(
     {
-        'httpMethod': 'GET',
-        'queryStringParameters': {
-            'TableName' :'questions'
+        'httpMethod': 'POST',
+        'body': {
+            'question_id': 1,
+            'answer': 'Python'
         }
     },
     None
