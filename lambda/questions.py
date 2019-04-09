@@ -6,11 +6,15 @@ DYNAMO = boto3.client('dynamodb', 'us-west-2')
 TABLE_NAME = 'questions'
 
 
-def get_random_question(dynamo):
+def get_random_question():
+    
     return {
         'question': 'what\'s your most frequently visted website below?',
         'answers':  ['reddit', 'medium', 'techcrunch', 'other']
     } # todo echo
+
+def post_question(body):
+    pass
 
 
 def respond(err, res=None):
@@ -37,14 +41,15 @@ def lambda_handler(event, context):
 
     operations = {
         'GET': get_random_question,
-        # todo 'POST': lambda dynamo, x: dynamo.put_item(**x)
+        # 'POST': lambda dynamo, x: dynamo.put_item(**x)
+        'POST': lambda body: post_question(body)
     }
 
     operation = event['httpMethod']
 
     if operation in operations:
         # payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
-        return respond(None, operations[operation](DYNAMO))
+        return respond(None, operations[operation]())
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
 
