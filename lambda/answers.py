@@ -2,18 +2,21 @@ import boto3
 import json
 from boto3.dynamodb.conditions import Key
 
+
 TABLE_NAME = 'questions'
 dynamo = boto3.resource('dynamodb', 'us-west-2')
 client = dynamo.Table(TABLE_NAME)
 
+
 def post_answer(payload):
-    # Expect the payload to be in this format:
     """
     expected payload from the request
     {
         "id": "quesiton_id",
         "answers": ["A", "B"]
         }
+
+    This function will pull user's multiple choices and update the stats for that question
     """
     print("payload: \n", payload)
     question_id = payload.get("id")
@@ -31,7 +34,6 @@ def post_answer(payload):
     client.put_item(Item=item)
 
 
-
 def respond(err, res=None):
     return {
         'statusCode': '400' if err else '200',
@@ -41,6 +43,7 @@ def respond(err, res=None):
             'Access-Control-Allow-Origin': '*'
         },
     }
+
 
 def lambda_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
@@ -56,7 +59,6 @@ def lambda_handler(event, context):
 
     operations = {
         'POST': lambda payload: post_answer(payload),
-        # todo 'POST': lambda dynamo, x: dynamo.put_item(**x)
     }
 
     op = event['httpMethod']
@@ -67,13 +69,13 @@ def lambda_handler(event, context):
         return respond(ValueError('Unsupported method "{}"'.format(op)))
 
 
-print(lambda_handler(
-    {
-        'httpMethod': 'POST',
-        'body': {
-            'id': "1",
-            'answers': ['Java']
-        }
-    },
-    None
-))
+# print(lambda_handler(
+#     {
+#         'httpMethod': 'POST',
+#         'body': {
+#             'id': "1",
+#             'answers': ['Java']
+#         }
+#     },
+#     None
+# ))
