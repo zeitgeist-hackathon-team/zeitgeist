@@ -1,7 +1,10 @@
 import boto3
 import json
-from utils import client
 from boto3.dynamodb.conditions import Key
+
+TABLE_NAME = 'questions'
+dynamo = boto3.resource('dynamodb', 'us-west-2')
+client = dynamo.Table(TABLE_NAME)
 
 def post_answer(payload):
     # Expect the payload to be in this format:
@@ -69,7 +72,7 @@ print(lambda_handler(
         'httpMethod': 'POST',
         'body': {
             'id': "1",
-            'answers': ['Python']
+            'answers': ['Java']
         }
     },
     None

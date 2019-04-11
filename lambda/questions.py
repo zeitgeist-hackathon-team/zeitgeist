@@ -2,29 +2,44 @@ import json
 from pprint import pprint
 from uuid import uuid4 as uuid
 from boto3.dynamodb.conditions import Key
-from utils import client
 from copy import deepcopy
+import decimal
+import boto3
 
+TABLE_NAME = 'questions'
+dynamo = boto3.resource('dynamodb', 'us-west-2')
+client = dynamo.Table(TABLE_NAME)
 
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return int(o)
+        return super(DecimalEncoder, self).default(o)
 
 def get_random_question():
-    # TODO get a random UUID
     """
     will return:
     {
         "id": "question_id",
         "question": "what is abc?",
-        "answers": {"A": 10, "B": 20, "C": 30}
+        "answers": {"A": 10, "B": 20, "C": 30},
+        'other': {
+            'hackernoon': 1,
+            'hackernews': 2
+        }
     }
 
     """
     random_uuid = str(uuid())
-
+    
+    # Todo work out a way to grab a random question
     response = client.query(
         KeyConditionExpression=Key('id').eq("1")
     )
-    item = response['Items']
+    item = response['Items'][0]
+    print(type(item))
     print(item)
+    return json.dumps(item, cls = DecimalEncoder)
 
 def post_question(payload):
     """
@@ -66,7 +81,7 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
-        'GET': get_random_question(),
+        'GET': lambda: get_random_question(),
         # 'POST': lambda dynamo, x: dynamo.put_item(**x)
         'POST': lambda payload: post_question(payload)
     }
@@ -76,7 +91,7 @@ def lambda_handler(event, context):
     if op in operations:
         # payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
         if op == "GET":
-            return respond(None, operations[op])
+            return respond(None, operations[op]())
         elif op == "POST":
             return respond(None, operations[op](event['body']))
     else:
@@ -86,11 +101,11 @@ def lambda_handler(event, context):
 pprint(lambda_handler(
     {
         'httpMethod': 'GET',
-        # 'body': {
-        # "id": "3",
-        # "question": "what is abc",
-        # "answers": ["A", "B", "C"]
-    # }
+        'body': {
+        "id": "4",
+        "question": "what is abc",
+        "answers": ["A", "B", "C"]
+    }
     },
     None
 ))
