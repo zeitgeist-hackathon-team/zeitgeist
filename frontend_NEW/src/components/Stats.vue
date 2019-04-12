@@ -34,13 +34,12 @@ export default {
     }
   },
   created () {
-    var vm = this
-    vm.chartOptions.series[0].data = Object.keys(this.data).map((key) => {
-      var val = vm.data[key]
-      if (key === vm.answerPicked) {
-        val++
+    this.chartOptions.series[0].data = Object.keys(this.data).map((choice) => {
+      var score = this.data[choice]
+      if (choice === this.answerPicked) {
+        score++
       }
-      return { name: key, y: val }
+      return { name: choice, y: score }
     })
   }
 }

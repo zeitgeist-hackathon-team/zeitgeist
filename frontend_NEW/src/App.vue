@@ -1,11 +1,11 @@
 <template>
-  <div class= "flex-item" style="flex-basis: 500px"  id="app">
+  <div class= "flex-item" id="app">
     <div class="error" v-for="e in errors" :key="e.message">{{e}}</div>
-    <h1>Zeitgest</h1>
+    <h1>Zeitgeist</h1>
     <h2>{{question.content}}</h2>
 
     <div class="choices flex-container" v-if="!anwerPicked">
-      <div class="choice" v-for="c in choices" :key="c" :question="question" >
+      <div v-for="c in choices" :key="c" >
         <div class="button" @click="pickAnswer(c)">
           {{c}}
         </div>
@@ -33,7 +33,7 @@ export default {
       question: {},
       choices: [],
       stats: {},
-      anwerPicked: false,
+      anwerPicked: '',
       errors: []
     }
   },
@@ -59,9 +59,9 @@ export default {
     axios
       .get(questionUrl)
       .then(response => {
-        this.question = { content: response.data.question, id: response.data.id }
-        this.choices = Object.keys(response.data.answers)
+        this.question = { id: response.data.id, content: response.data.question }
         this.stats = response.data.answers
+        this.choices = Object.keys(this.stats)
       })
       .catch(e => {
         this.errors.push(e)
@@ -78,7 +78,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-  flex-basis: 300px;
+  flex-basis: 500px;
   max-width: 1000px;
 }
 
