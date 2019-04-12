@@ -39,11 +39,20 @@ def respond(err, res=None):
         'statusCode': '400' if err else '200',
         'body': err.message if err else json.dumps(res),
         'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
+            'Access-Control-Allow-Origin': '*',
+        }
     }
 
+
+def respondOPTIONS():
+    return {
+        'statusCode': '200',
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        }
+    }
 
 def lambda_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
@@ -58,24 +67,16 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
-        'POST': lambda payload: post_answer(payload),
+        'POST': lambda payload: post_answer(payload)
     }
 
     op = event['httpMethod']
 
+    if op == 'OPTIONS':
+        return respondOPTIONS()
+
     if op in operations:
-        return respond(None, operations[op](event['body']))
+        return respond(None, operations[op](json.loads(event['body'])))
     else:
         return respond(ValueError('Unsupported method "{}"'.format(op)))
 
-
-# print(lambda_handler(
-#     {
-#         'httpMethod': 'POST',
-#         'body': {
-#             'id': "1",
-#             'answers': ['Java']
-#         }
-#     },
-#     None
-# ))

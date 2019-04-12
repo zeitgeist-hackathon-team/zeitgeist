@@ -42,7 +42,7 @@ export default {
       this.anwerPicked = c
 
       var payload = {
-        question: this.question.id,
+        id: this.question.id,
         answers: [c]
       }
 
