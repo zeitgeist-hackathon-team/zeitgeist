@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="error" v-for="e in errors" :key="e">{{JSON.stringify}}</div>
+    <div class="error" v-for="e in errors" :key="e">{{e}}</div>
     <h1>Zeitgest</h1>
     <h2>{{question}}</h2>
     <div v-if="!anwerPicked">
@@ -16,8 +16,7 @@ import axios from 'axios'
 import Choice from './components/Choice'
 import Stats from './components/Stats'
 
-const url =
-  'https://6f079e8c-7090-4d70-a952-d40dbe3703f1.mock.pstmn.io/default/questions'
+const url = 'https://jqdrbwa4u7.execute-api.us-west-2.amazonaws.com/default/questions'
 
 export default {
   name: 'App',
@@ -49,7 +48,7 @@ export default {
         that.stats = response.data.answers
       })
       .catch(e => {
-        this.errors.push(e)
+        that.errors.push(e)
       })
   }
 }
@@ -63,5 +62,8 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.error {
+  color: red;
 }
 </style>

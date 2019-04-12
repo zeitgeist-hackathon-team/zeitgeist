@@ -19,10 +19,13 @@ export default {
   },
   methods: {
     postAnswer () {
-      this.$emit('answer-picked')
+      var that = this
       axios.post(url)
+        .then(response => {
+          that.$emit('answer-picked')
+        })
         .catch(e => {
-          this.errors.push(e)
+          that.errors.push(e)
         })
     }
   }

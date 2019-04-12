@@ -88,7 +88,7 @@ def get_random_question():
     pick = int(random() * count)
     question = questions[pick]
     
-    return json.dumps(question, cls = DecimalEncoder)
+    return question
 
 
 def generate_a_new_primary_id():
@@ -133,7 +133,7 @@ def post_question(payload):
 def respond(err, res=None):
     return {
         'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res),
+        'body': err.message if err else json.dumps(res, cls = DecimalEncoder),
         'headers': {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
@@ -169,15 +169,3 @@ def lambda_handler(event, context):
             return respond(None, operations[op](event['body']))
     else:
         return respond(ValueError('Unsupported method "{}"'.format(op)))
-
-
-# pprint(lambda_handler(
-#     {
-#         'httpMethod': 'GET',
-#     #     'body': {
-#     #     "question": "what is abc",
-#     #     "answers": ["A", "B", "C"]
-#     # }
-#     },
-#     None
-# ))

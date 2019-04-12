@@ -21,30 +21,16 @@ export default {
         series: [{
           name: 'Answers',
           colorByPoint: true,
-          data: [{
-            name: 'Chrome',
-            y: 61.41,
-            sliced: true,
-            selected: true
-          }, {
-            name: 'Internet Explorer',
-            y: 11.84
-          }, {
-            name: 'Firefox',
-            y: 10.85
-          }, {
-            name: 'Edge',
-            y: 4.67
-          }, {
-            name: 'Safari',
-            y: 4.18
-          }, {
-            name: 'Other',
-            y: 7.05
-          }]
+          data: []
         }]
       }
     }
+  },
+  created () {
+    var vm = this
+    vm.chartOptions.series[0].data = Object.keys(this.data).map((key) => {
+      return { name: key, y: vm.data[key] }
+    })
   }
 }
 </script>
