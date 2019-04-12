@@ -1,32 +1,36 @@
 <template>
-  <div id="app">
-    <div class="error" v-for="e in errors" :key="e">{{e}}</div>
+  <div class= "flex-item" style="flex-basis: 500px"  id="app">
+    <div class="error" v-for="e in errors" :key="e.message">{{e}}</div>
     <h1>Zeitgest</h1>
-    <h2>{{question}}</h2>
-    <div v-if="!anwerPicked">
-      <Choice v-for="c in choices" :key="c" @answer-picked="showStats()">{{c}}</Choice>
+    <h2>{{question.content}}</h2>
+
+    <div class="choices flex-container" v-if="!anwerPicked">
+      <div class="choice" v-for="c in choices" :key="c" :question="question" >
+        <div class="button" @click="pickAnswer(c)">
+          {{c}}
+        </div>
+      </div>
     </div>
 
-    <Stats :data="stats" v-if="anwerPicked"/>
+    <Stats class="stats" v-if="anwerPicked" :data="stats" :answer-picked="anwerPicked" />
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import Choice from './components/Choice'
 import Stats from './components/Stats'
 
-const url = 'https://jqdrbwa4u7.execute-api.us-west-2.amazonaws.com/default/questions'
+const questionUrl = 'https://jqdrbwa4u7.execute-api.us-west-2.amazonaws.com/default/questions'
+const answerUrl = 'https://omca46prfc.execute-api.us-west-2.amazonaws.com/default/answers'
 
 export default {
   name: 'App',
   components: {
-    Choice,
     Stats
   },
   data () {
     return {
-      question: '',
+      question: {},
       choices: [],
       stats: {},
       anwerPicked: false,
@@ -34,21 +38,33 @@ export default {
     }
   },
   methods: {
-    showStats () {
-      this.anwerPicked = true
+    pickAnswer (c) {
+      this.anwerPicked = c
+
+      var payload = {
+        question: this.question.id,
+        answers: [c]
+      }
+
+      axios.post(answerUrl, payload)
+        .then(response => {
+          console.log(response.status)
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
     }
   },
   created () {
-    var that = this
     axios
-      .get(url)
+      .get(questionUrl)
       .then(response => {
-        that.question = response.data.question
-        that.choices = Object.keys(response.data.answers)
-        that.stats = response.data.answers
+        this.question = { content: response.data.question, id: response.data.id }
+        this.choices = Object.keys(response.data.answers)
+        this.stats = response.data.answers
       })
       .catch(e => {
-        that.errors.push(e)
+        this.errors.push(e)
       })
   }
 }
@@ -62,8 +78,31 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  flex-basis: 300px;
+  max-width: 1000px;
 }
+
+.choices {
+  justify-content: space-evenly;
+}
+
+.button {
+  background-color: lightblue;
+  padding: 5px;
+  border-radius: 0.5em;
+  min-width: 75px;
+  max-width: 200px;
+  height: auto;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: rgb(132, 167, 179);
+  color: white;
+}
+
 .error {
   color: red;
 }
+
 </style>
