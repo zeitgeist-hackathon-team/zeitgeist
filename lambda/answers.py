@@ -23,6 +23,7 @@ def post_answer(payload):
     response = client.query(
         KeyConditionExpression=Key('id').eq(question_id)
     )
+    
     item = response['Items'][0]
     print(type(item))
     print("item: \n", item)
@@ -44,7 +45,7 @@ def respond(err, res=None):
     }
 
 
-def respondOPTIONS():
+def respondOPTIONS(payload):
     return {
         'statusCode': '200',
         'headers': {
@@ -67,16 +68,13 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
-        'POST': lambda payload: post_answer(payload)
+        'POST': lambda payload: post_answer(payload),
+        'OPTIONS': respondOPTIONS
     }
 
     op = event['httpMethod']
-
-    if op == 'OPTIONS':
-        return respondOPTIONS()
 
     if op in operations:
         return respond(None, operations[op](json.loads(event['body'])))
     else:
         return respond(ValueError('Unsupported method "{}"'.format(op)))
-

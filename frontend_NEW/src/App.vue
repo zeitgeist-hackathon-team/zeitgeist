@@ -1,13 +1,15 @@
 <template>
-  <div class= "flex-item" id="app">
+  <div class="d-flex flex-column align-items-center" id="app">
     <div class="error" v-for="e in errors" :key="e.message">{{e}}</div>
-    <h1>Zeitgeist</h1>
-    <h2>{{question.content}}</h2>
+    <h1 class="logo">Zeitgeist</h1>
+    <div class="subtitle">The spirit of the time!</div>
+    <div class="question outlined">{{question.content}}</div>
 
-    <div class="choices flex-container" v-if="!anwerPicked">
+      <div class="choices-container" v-if="!anwerPicked">
       <div v-for="c in choices" :key="c" >
-        <div class="button" @click="pickAnswer(c)">
-          {{c}}
+        <div class="choice-btn outlined d-flex flex-row justify-content-between" @click="pickAnswer(c)">
+          <div>{{c}}</div>
+          <i class="fa fa-paper-plane"></i>
         </div>
       </div>
     </div>
@@ -71,38 +73,56 @@ export default {
 </script>
 
 <style>
+.logo {
+  font-family: 'Fair Prosper';
+  font-size: 5.5em;
+  margin-top: 50px;
+}
+
+.subtitle {
+  font-weight: normal;
+  font-size: 2em;
+  margin-top: -20px;
+  margin-right: -200px;
+}
+
+.question {
+  font-size: 2.2em;
+  text-align: center;
+  margin-top: 100px;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-weight: bold;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
-  flex-basis: 500px;
-  max-width: 1000px;
+  width: 50%;
+  margin: auto;
 }
 
-.choices {
-  justify-content: space-evenly;
+.choices-container {
+  margin-top: 50px;
+  width: 100%;
 }
 
-.button {
-  background-color: lightblue;
-  padding: 5px;
-  border-radius: 0.5em;
-  min-width: 75px;
-  max-width: 200px;
-  height: auto;
-  cursor: pointer;
+.outlined {
+  background-color: white;
+  border: 2px black solid;
+  border-radius: 10px;
+  padding: 2px 10px;
+  width: 100%;
 }
 
-.button:hover {
-  background-color: rgb(132, 167, 179);
-  color: white;
+.hoverable:hover {
+  background-color: gray;
 }
 
-.error {
-  color: red;
+.choice-btn {
+  margin-bottom: 20px;
+  text-align: left;
+  opacity: 0.9;
 }
 
 </style>
