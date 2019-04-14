@@ -20,7 +20,8 @@ export default {
     return {
       chartOptions: {
         chart: {
-          type: 'pie'
+          type: 'pie',
+          backgroundColor: 'transparent'
         },
         title: {
           text: ''

@@ -1,26 +1,37 @@
 <template>
-  <div class="d-flex flex-column align-items-center" id="app">
+  <div class="d-flex flex-column align-items-center justify-content-around" id="app">
     <div class="error" v-for="e in errors" :key="e.message">{{e}}</div>
-    <h1 class="logo">Zeitgeist</h1>
-    <div class="subtitle">The spirit of the time!</div>
-    <div class="question outlined">{{question.content}}</div>
+    <div>
+      <h1 class="logo">Zeitgeist</h1>
+      <div class="subtitle">The spirit of the time</div>
+    </div>
+    <div class="question">{{question.content}}</div>
 
-      <div class="choices-container" v-if="!anwerPicked">
+    <div class="choices-container" v-if="!showChart">
       <div v-for="c in choices" :key="c" >
-        <div class="choice-btn outlined d-flex flex-row justify-content-between" @click="pickAnswer(c)">
+        <div class="choice card d-flex flex-row justify-content-between align-items-center" @click="pickAnswer(c)">
           <div>{{c}}</div>
-          <i class="fa fa-paper-plane"></i>
+          <i class="fa fa-paper-plane" :class="{fly: answerPicked == c}"></i>
         </div>
       </div>
     </div>
 
-    <Stats class="stats" v-if="anwerPicked" :data="stats" :answer-picked="anwerPicked" />
+    <Stats class="stats" v-if="showChart" :data="stats" :answer-picked="answerPicked" />
+
+    <div class="btn btn-info" @click="showModal = true">PostQuestion</div>
+
+    <Modal v-if="showModal" @close="showModal = false">
+      <h3 slot="header">Post New Question</h3>
+      <PostQuestion/>
+    </Modal>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 import Stats from './components/Stats'
+import Modal from './components/Modal'
+import PostQuestion from './components/PostQuestion'
 
 const questionUrl = 'https://jqdrbwa4u7.execute-api.us-west-2.amazonaws.com/default/questions'
 const answerUrl = 'https://omca46prfc.execute-api.us-west-2.amazonaws.com/default/answers'
@@ -28,20 +39,24 @@ const answerUrl = 'https://omca46prfc.execute-api.us-west-2.amazonaws.com/defaul
 export default {
   name: 'App',
   components: {
-    Stats
+    Stats,
+    PostQuestion,
+    Modal
   },
   data () {
     return {
       question: {},
       choices: [],
       stats: {},
-      anwerPicked: '',
-      errors: []
+      answerPicked: '',
+      errors: [],
+      showChart: false,
+      showModal: false
     }
   },
   methods: {
     pickAnswer (c) {
-      this.anwerPicked = c
+      this.answerPicked = c
 
       var payload = {
         id: this.question.id,
@@ -55,6 +70,8 @@ export default {
         .catch(e => {
           this.errors.push(e)
         })
+
+      setTimeout(() => { this.showChart = true }, 800)
     }
   },
   created () {
@@ -75,7 +92,7 @@ export default {
 <style>
 .logo {
   font-family: 'Fair Prosper';
-  font-size: 5.5em;
+  font-size: 5.0em;
   margin-top: 50px;
 }
 
@@ -84,12 +101,13 @@ export default {
   font-size: 2em;
   margin-top: -20px;
   margin-right: -200px;
+  /* todo change font family */
 }
 
 .question {
   font-size: 2.2em;
   text-align: center;
-  margin-top: 100px;
+  margin-top: 50px;
 }
 
 #app {
@@ -107,22 +125,43 @@ export default {
   width: 100%;
 }
 
-.outlined {
+.card {
   background-color: white;
-  border: 2px black solid;
-  border-radius: 10px;
   padding: 2px 10px;
+  border-radius: 0;
+  box-shadow: 0 0 3px lightgray;
   width: 100%;
+  transition: all .09s ease-in-out;
 }
 
-.hoverable:hover {
-  background-color: gray;
+.card:hover {
+  transform: scale(1.09);
+  background-color: rgb(230, 230, 230);
 }
 
-.choice-btn {
-  margin-bottom: 20px;
+.choice {
+  margin-bottom: 10px;
   text-align: left;
-  opacity: 0.9;
+  position: relative;
+}
+
+@keyframes fly-animation {
+  from {
+    left: 0px;
+    bottom: 0px;
+    }
+  to {
+    left: 100px;
+    bottom: 50px;
+    opacity: 0;
+  }
+}
+
+.fly {
+  position: relative;
+  animation-name: fly-animation;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out
 }
 
 </style>
