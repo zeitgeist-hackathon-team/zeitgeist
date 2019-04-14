@@ -1,10 +1,10 @@
 <template>
   <div class="d-flex flex-column align-items-center justify-content-around" id="app">
     <div class="error" v-for="e in errors" :key="e.message">{{e}}</div>
-    <div>
+    <!-- <div>
       <h1 class="logo">Zeitgeist</h1>
       <div class="subtitle">The spirit of the time</div>
-    </div>
+    </div> -->
     <div class="question">{{question.content}}</div>
 
     <div class="choices-container" v-if="!showChart">
@@ -18,11 +18,17 @@
 
     <Stats class="stats" v-if="showChart" :data="stats" :answer-picked="answerPicked" />
 
-    <div class="btn btn-info" @click="showModal = true">PostQuestion</div>
+    <div id="post-btn"
+      title="Post new question"
+      class="btn btn-success"
+      @click="showModal = true">
+      <i class="fa fa-plus"></i>
+    </div>
 
-    <Modal v-if="showModal" @close="showModal = false">
+    <Modal v-if="showModal" @cancel="showModal = false" @post="postQuestion">
       <h3 slot="header">Post New Question</h3>
       <PostQuestion/>
+      <div slot="btn-text">Post <i class="fa fa-paper-plane"></i></div>
     </Modal>
   </div>
 </template>
@@ -72,6 +78,10 @@ export default {
         })
 
       setTimeout(() => { this.showChart = true }, 800)
+    },
+    postQuestion (event) {
+      this.showModal = false
+      alert('blah')
     }
   },
   created () {
@@ -85,22 +95,24 @@ export default {
       .catch(e => {
         this.errors.push(e)
       })
+  },
+  mounted () {
+    this.$root.$on('add-update-question', question => {
+      window.console.log(question)
+    })
   }
 }
 </script>
 
 <style>
 .logo {
-  font-family: 'Fair Prosper';
-  font-size: 5.0em;
+  font-size: 2.0em;
   margin-top: 50px;
 }
 
 .subtitle {
   font-weight: normal;
-  font-size: 2em;
-  margin-top: -20px;
-  margin-right: -200px;
+  font-size: 1.5em;
   /* todo change font family */
 }
 
@@ -162,6 +174,12 @@ export default {
   animation-name: fly-animation;
   animation-duration: 0.8s;
   animation-timing-function: ease-out
+}
+
+#post-btn {
+  position: fixed;
+  right: 5px;
+  top: 5px;
 }
 
 </style>

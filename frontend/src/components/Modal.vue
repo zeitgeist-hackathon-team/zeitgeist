@@ -8,11 +8,14 @@
           </div>
 
           <div class="modal-body">
-            <slot >empty body</slot>
+            <slot>empty body</slot>
           </div>
 
           <div class="modal-footer">
-            <button class="btn btn-success" @click="$emit('close')">OK</button>
+            <button class="btn btn-danger" @click="$emit('cancel')">Cancel</button>
+            <button class="btn btn-success" @click="$emit('post')">
+              <slot name="btn-text">OK</slot>
+            </button>
           </div>
         </div>
       </div>
@@ -43,7 +46,7 @@ export default {}
 }
 
 .modal-container {
-  width: 400px;
+  width: 600px;
   margin: 0px auto;
   padding: 20px 30px;
   background-color: #fff;
