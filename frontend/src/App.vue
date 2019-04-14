@@ -1,10 +1,20 @@
 <template>
   <div class="d-flex flex-column align-items-center justify-content-around" id="app">
     <div class="error" v-for="e in errors" :key="e.message">{{e}}</div>
-    <!-- <div>
-      <h1 class="logo">Zeitgeist</h1>
-      <div class="subtitle">The spirit of the time</div>
-    </div> -->
+
+    <half-circle-spinner
+      v-if="!Object.keys(question).length"
+      :animation-duration="1000"
+      :size="60"
+      color="#383838"
+      style="margin-top: 100px"
+    />
+
+    <a href="https://github.com/zeitgeist-hackathon-team/zeitgeist" class="watermark">
+      <span class="logo">Zeitgeist</span>:
+      <span class="subtitle">The spirit of the time</span>
+    </a>
+
     <div class="question">{{question.content}}</div>
 
     <div class="choices-container" v-if="!showChart">
@@ -20,15 +30,15 @@
 
     <div id="post-btn"
       title="Post new question"
+      v-if="showChart"
       class="btn btn-success"
       @click="showModal = true">
-      <i class="fa fa-plus"></i>
+      Post your own question!
     </div>
 
-    <Modal v-if="showModal" @cancel="showModal = false" @post="postQuestion">
+    <Modal v-if="showModal">
       <h3 slot="header">Post New Question</h3>
-      <PostQuestion/>
-      <div slot="btn-text">Post <i class="fa fa-paper-plane"></i></div>
+      <PostQuestion @cancel="showModal=false" @post="postQuestion"/>
     </Modal>
   </div>
 </template>
@@ -38,6 +48,7 @@ import axios from 'axios'
 import Stats from './components/Stats'
 import Modal from './components/Modal'
 import PostQuestion from './components/PostQuestion'
+import { HalfCircleSpinner } from 'epic-spinners'
 
 const questionUrl = 'https://jqdrbwa4u7.execute-api.us-west-2.amazonaws.com/default/questions'
 const answerUrl = 'https://omca46prfc.execute-api.us-west-2.amazonaws.com/default/answers'
@@ -47,7 +58,8 @@ export default {
   components: {
     Stats,
     PostQuestion,
-    Modal
+    Modal,
+    HalfCircleSpinner
   },
   data () {
     return {
@@ -57,7 +69,8 @@ export default {
       answerPicked: '',
       errors: [],
       showChart: false,
-      showModal: false
+      showModal: false,
+      newQuestion: {}
     }
   },
   methods: {
@@ -81,7 +94,13 @@ export default {
     },
     postQuestion (event) {
       this.showModal = false
-      alert('blah')
+      axios.post(questionUrl, event)
+        .then(response => {
+          console.log(response.status)
+        })
+        .catch(e => {
+          this.error.push(e)
+        })
     }
   },
   created () {
@@ -91,29 +110,45 @@ export default {
         this.question = { id: response.data.id, content: response.data.question }
         this.stats = response.data.answers
         this.choices = Object.keys(this.stats)
+
+        if (this.choices.indexOf('other') > -1) {
+          this.choices.splice(this.choices.indexOf('other'), 1)
+          this.choices.push('other')
+        }
       })
       .catch(e => {
         this.errors.push(e)
       })
   },
   mounted () {
-    this.$root.$on('add-update-question', question => {
-      window.console.log(question)
+    this.$root.$on('add-update-question', postedQuestion => {
+      this.newQuestion.question = postedQuestion.body
+      this.newQuestion.answers = postedQuestion.options.map((option) => option.body)
     })
   }
 }
 </script>
 
 <style>
-.logo {
-  font-size: 2.0em;
-  margin-top: 50px;
+.error {
+  color: red;
 }
 
-.subtitle {
-  font-weight: normal;
-  font-size: 1.5em;
-  /* todo change font family */
+.watermark {
+  position: fixed;
+  bottom: 5px;
+  left: 15px;
+  color: gray;
+}
+
+.watermark > .logo {
+  font-size: 2.4em;
+  font-family: 'East Sea Dokdo', cursive;
+  position: relative;
+}
+
+.watermark > .subtitle {
+  font-style: italic;
 }
 
 .question {

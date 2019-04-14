@@ -10,13 +10,6 @@
           <div class="modal-body">
             <slot>empty body</slot>
           </div>
-
-          <div class="modal-footer">
-            <button class="btn btn-danger" @click="$emit('cancel')">Cancel</button>
-            <button class="btn btn-success" @click="$emit('post')">
-              <slot name="btn-text">OK</slot>
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -54,6 +47,8 @@ export default {}
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
+  max-height: 600px;
+  overflow-y: auto;
 }
 
 .modal-header h3 {
