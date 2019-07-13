@@ -1,18 +1,29 @@
-# zeitgeist
-find out what other people are thinking!
+# zeitgeist-frontend
 
-
-
-## How to run locally
-
-``` bash
-# cd into the frontend folder
-cd frontend
-
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
+## Project setup
 ```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Run your tests
+```
+npm run test
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

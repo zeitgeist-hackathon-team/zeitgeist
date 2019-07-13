@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column align-items-center justify-content-around" id="app">
+  <div class="d-flex flex-column align-items-center justify-content-around">
     <div class="error" v-for="e in errors" :key="e.message">{{e}}</div>
 
     <half-circle-spinner
