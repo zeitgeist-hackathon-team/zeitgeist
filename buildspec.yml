@@ -4,6 +4,8 @@ phases:
   install:
     runtime-versions:
       nodejs: 8
+    commands:
+      - npm install
   pre_build:
     commands:
       - echo Nothing to do in the pre-build phases
