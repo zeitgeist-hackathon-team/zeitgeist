@@ -1,0 +1,10 @@
+{
+    "name": "Zeitgeist",
+    "version": "0.0.1",
+    "manifest_version": 2,
+    "description": "Chrome extension to find out what other people are thinking!",
+    "homepage_url": "https://github.com/ZeitgeistOrg",
+    "chrome_url_overrides": {
+      "newtab": "index.html"
+    }
+  }
